@@ -1,0 +1,45 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "E-commerce API",
+        "description": "API REST para usuarios, productos, órdenes y pagos.",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/health": {
+            "get": {
+                "tags": [
+                    "Sistema"
+                ],
+                "summary": "Verificar el estado de la API",
+                "operationId": "cbc13db3297c49c5744bbed556dda6ce",
+                "responses": {
+                    "200": {
+                        "description": "API funcionando correctamente"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Sistema",
+            "description": "Sistema"
+        }
+    ]
+}
