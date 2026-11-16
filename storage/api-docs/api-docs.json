@@ -2,7 +2,7 @@
     "openapi": "3.0.0",
     "info": {
         "title": "E-commerce API",
-        "description": "API REST para usuarios, productos, órdenes y pagos.",
+        "description": "API REST para gestión de usuarios, productos, órdenes y pagos mediante Stripe. Incluye autenticación JWT.",
         "version": "1.0.0"
     },
     "paths": {
@@ -16,6 +16,655 @@
                 "responses": {
                     "200": {
                         "description": "API funcionando correctamente"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/register": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Registrar un usuario",
+                "operationId": "2352697b7b679dc899815f1209587ae9",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Usuario Prueba"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "prueba@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password123"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Usuario registrado correctamente"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/login": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Iniciar sesión y obtener token JWT",
+                "operationId": "9d2ff32f1b1945f60f2f7cb2f283a191",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "prueba@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "Password123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Inicio de sesión correcto. Devuelve el token JWT"
+                    },
+                    "401": {
+                        "description": "Credenciales incorrectas"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/me": {
+            "get": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Obtener el usuario autenticado",
+                "operationId": "62393eaf5a64771f623108e55d7ae346",
+                "responses": {
+                    "200": {
+                        "description": "Información del usuario autenticado"
+                    },
+                    "401": {
+                        "description": "No autenticado o token inválido"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/logout": {
+            "post": {
+                "tags": [
+                    "Autenticación"
+                ],
+                "summary": "Cerrar sesión e invalidar el token",
+                "operationId": "1bd8857d531558de68b15681b485bd86",
+                "responses": {
+                    "200": {
+                        "description": "Sesión cerrada correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado o token inválido"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/products": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Listar productos activos",
+                "operationId": "9a1c6c822b68098f621bcf9759327214",
+                "responses": {
+                    "200": {
+                        "description": "Listado de productos"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Crear un producto",
+                "operationId": "8401c6d57bc96cccf1610ad8dde6f870",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "price"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Teclado Mecánico"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "example": "Teclado RGB",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 39.99
+                                    },
+                                    "stock": {
+                                        "type": "integer",
+                                        "example": 20
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "example": "teclado.jpg",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Producto creado correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/products/{product}": {
+            "get": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Consultar un producto",
+                "operationId": "616339f52291ae5728b5bfd08a59757a",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "ID del producto",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Producto encontrado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                },
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            },
+            "put": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Actualizar un producto",
+                "operationId": "0e9f2cf61c785c1c5d4175ce1a007e4f",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "description": "ID del producto",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "Teclado Mecánico actualizado"
+                                    },
+                                    "description": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "price": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": 44.99
+                                    },
+                                    "stock": {
+                                        "type": "integer",
+                                        "example": 15
+                                    },
+                                    "image": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "is_active": {
+                                        "type": "boolean",
+                                        "example": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Producto actualizado correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    },
+                    "422": {
+                        "description": "Datos de validación incorrectos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Productos"
+                ],
+                "summary": "Eliminar un producto",
+                "operationId": "2c37cf46b12c2e8d8f533e7ac7f6b1be",
+                "parameters": [
+                    {
+                        "name": "product",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Producto eliminado correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Producto no encontrado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/orders": {
+            "get": {
+                "tags": [
+                    "Órdenes"
+                ],
+                "summary": "Listar las órdenes del usuario autenticado",
+                "operationId": "1a91315bdcb12b3d886e9c58d2ef791a",
+                "responses": {
+                    "200": {
+                        "description": "Listado de órdenes del usuario"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Órdenes"
+                ],
+                "summary": "Crear una orden",
+                "operationId": "185efcc8ec2488b11b4ad33bd532085e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "items"
+                                ],
+                                "properties": {
+                                    "items": {
+                                        "type": "array",
+                                        "items": {
+                                            "required": [
+                                                "product_id",
+                                                "quantity"
+                                            ],
+                                            "properties": {
+                                                "product_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "quantity": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Orden creada correctamente"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "422": {
+                        "description": "Producto inválido, inactivo o stock insuficiente"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/orders/{id}": {
+            "get": {
+                "tags": [
+                    "Órdenes"
+                ],
+                "summary": "Consultar una orden del usuario autenticado",
+                "operationId": "2be996fd6813ab56aff7bea36689da73",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Información de la orden"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Orden no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/payments/create-intent": {
+            "post": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Crear un intento de pago con Stripe",
+                "operationId": "6b763d9bfb0532381b2ae9999450f813",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "order_id"
+                                ],
+                                "properties": {
+                                    "order_id": {
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Intento de pago creado. Devuelve payment_intent_id y client_secret"
+                    },
+                    "401": {
+                        "description": "No autenticado"
+                    },
+                    "404": {
+                        "description": "Orden no encontrada"
+                    },
+                    "422": {
+                        "description": "La orden no está pendiente de pago o los datos son inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ],
+                "servers": [
+                    {
+                        "url": "http://127.0.0.1:8001",
+                        "description": "Servidor local"
+                    }
+                ]
+            }
+        },
+        "/api/stripe/webhook": {
+            "post": {
+                "tags": [
+                    "Pagos"
+                ],
+                "summary": "Recibir notificaciones de Stripe",
+                "description": "Endpoint público utilizado por Stripe para notificar eventos de pago. Valida la firma mediante el encabezado Stripe-Signature.",
+                "operationId": "7b9c7d8e02c9b5189083564ab2d11dda",
+                "parameters": [
+                    {
+                        "name": "Stripe-Signature",
+                        "in": "header",
+                        "description": "Firma enviada por Stripe para validar el webhook",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "description": "Evento enviado por Stripe",
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Webhook procesado correctamente"
+                    },
+                    "400": {
+                        "description": "Firma del webhook inválida"
                     }
                 },
                 "servers": [
@@ -40,6 +689,22 @@
         {
             "name": "Sistema",
             "description": "Sistema"
+        },
+        {
+            "name": "Autenticación",
+            "description": "Autenticación"
+        },
+        {
+            "name": "Productos",
+            "description": "Productos"
+        },
+        {
+            "name": "Órdenes",
+            "description": "Órdenes"
+        },
+        {
+            "name": "Pagos",
+            "description": "Pagos"
         }
     ]
 }
