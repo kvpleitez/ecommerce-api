@@ -3,23 +3,24 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
-use App\Models\Order;
+use App\Http\Requests\CreatePaymentIntentRequest;
 use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Stripe\Stripe;
 use Stripe\PaymentIntent;
-use Illuminate\Support\Facades\DB;
 use Stripe\Webhook;
 use Stripe\Exception\SignatureVerificationException;
 
 class PaymentController extends Controller
 {
-    public function createIntent(Request $request): JsonResponse
+    /**
+     * Crear un intento de pago con Stripe.
+     */
+    public function createIntent(CreatePaymentIntentRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'order_id' => 'required|integer|exists:orders,id',
-        ]);
+        $validated = $request->validated();
 
         $order = $request->user()
             ->orders()
@@ -35,17 +36,17 @@ class PaymentController extends Controller
         Stripe::setApiKey(config('services.stripe.secret'));
 
         $intent = PaymentIntent::create([
-        'amount' => (int) round($order->total * 100),
-        'currency' => 'usd',
-        'automatic_payment_methods' => [
-            'enabled' => true,
-            'allow_redirects' => 'never',
-        ],
-        'metadata' => [
-            'order_id' => $order->id,
-            'user_id' => $request->user()->id,
-        ],
-    ]);
+            'amount' => (int) round($order->total * 100),
+            'currency' => 'usd',
+            'automatic_payment_methods' => [
+                'enabled' => true,
+                'allow_redirects' => 'never',
+            ],
+            'metadata' => [
+                'order_id' => $order->id,
+                'user_id' => $request->user()->id,
+            ],
+        ]);
 
         Payment::create([
             'order_id' => $order->id,
@@ -67,6 +68,9 @@ class PaymentController extends Controller
         ], 201);
     }
 
+    /**
+     * Procesar los eventos enviados por Stripe.
+     */
     public function handleWebhook(Request $request): JsonResponse
     {
         try {
@@ -94,7 +98,7 @@ class PaymentController extends Controller
                     $intent->id
                 )->lockForUpdate()->first();
 
-                if (!$payment) {
+                if (! $payment) {
                     return;
                 }
 

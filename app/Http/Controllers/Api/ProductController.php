@@ -3,13 +3,16 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreProductRequest;
+use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
-    // Listar productos activos
+    /**
+     * Listar productos activos.
+     */
     public function index(): JsonResponse
     {
         $products = Product::where('is_active', true)->get();
@@ -20,7 +23,9 @@ class ProductController extends Controller
         ]);
     }
 
-    // Mostrar un producto específico
+    /**
+     * Mostrar un producto específico.
+     */
     public function show(Product $product): JsonResponse
     {
         if (! $product->is_active) {
@@ -36,17 +41,12 @@ class ProductController extends Controller
         ]);
     }
 
-    // Crear un producto
-    public function store(Request $request): JsonResponse
+    /**
+     * Crear un producto.
+     */
+    public function store(StoreProductRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'required|numeric|min:0',
-            'stock' => 'sometimes|integer|min:0',
-            'image' => 'nullable|string|max:255',
-            'is_active' => 'sometimes|boolean',
-        ]);
+        $validated = $request->validated();
 
         $product = Product::create($validated);
 
@@ -57,17 +57,14 @@ class ProductController extends Controller
         ], 201);
     }
 
-    // Actualizar un producto
-    public function update(Request $request, Product $product): JsonResponse
-    {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'description' => 'nullable|string',
-            'price' => 'sometimes|required|numeric|min:0',
-            'stock' => 'sometimes|integer|min:0',
-            'image' => 'nullable|string|max:255',
-            'is_active' => 'sometimes|boolean',
-        ]);
+    /**
+     * Actualizar un producto.
+     */
+    public function update(
+        UpdateProductRequest $request,
+        Product $product
+    ): JsonResponse {
+        $validated = $request->validated();
 
         $product->update($validated);
 
@@ -78,7 +75,9 @@ class ProductController extends Controller
         ]);
     }
 
-    // Eliminar un producto
+    /**
+     * Eliminar un producto.
+     */
     public function destroy(Product $product): JsonResponse
     {
         $product->delete();

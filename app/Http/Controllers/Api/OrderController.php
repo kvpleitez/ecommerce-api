@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
@@ -12,14 +13,12 @@ use Illuminate\Validation\ValidationException;
 
 class OrderController extends Controller
 {
-    // Crear una orden
-    public function store(Request $request): JsonResponse
+    /**
+     * Crear una orden.
+     */
+    public function store(StoreOrderRequest $request): JsonResponse
     {
-        $validated = $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_id' => 'required|integer|distinct|exists:products,id',
-            'items.*.quantity' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         $order = DB::transaction(function () use ($request, $validated) {
 
@@ -77,7 +76,9 @@ class OrderController extends Controller
         ], 201);
     }
 
-    // Consultar historial de órdenes del usuario
+    /**
+     * Consultar historial de órdenes del usuario.
+     */
     public function index(Request $request): JsonResponse
     {
         $orders = $request->user()
@@ -92,7 +93,9 @@ class OrderController extends Controller
         ]);
     }
 
-    // Consultar una orden específica
+    /**
+     * Consultar una orden específica.
+     */
     public function show(Request $request, int $id): JsonResponse
     {
         $order = $request->user()
